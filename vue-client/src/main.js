@@ -1,17 +1,19 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import VueCkeditor from 'vue-ckeditor2';
 
 Vue.config.productionTip = false
 
 Vue.use(VueRouter)
+Vue.use(VueCkeditor);
 
 import Dashboard from './components/Dashboard.vue';
 import Calendrier from './components/Calendrier.vue';
-import RendezVousForm from './components/RendezVousForm.vue';
+import Modele from './components/Modele.vue';
 
 const routes = [
   { path: '/calendrier', component: Calendrier },
-  { path: '/ajouter', component: RendezVousForm },
+  { path: '/modele', component: Modele },
 ]
 
 const router = new VueRouter({

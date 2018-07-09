@@ -1,12 +1,15 @@
 <template>
-   <div class="col-md-10"> 
-      <div id="calendrier">         
-        <table> 
-        <div id="titre">{{ calendrier.calendrierMois }}</div>        
-        <button v-on:click='suivant' id='logout-button'> Suiv </button>
-        <button v-on:click='precedent' id='logout-button'> Prec </button>
-        <button v-on:click='aujourdhui' id='logout-button'> Today </button>
-     
+   <div> 
+      <div id="calendrier" class="col-md-6">         
+        <table>                
+        <div id="titre">
+            <div>
+              <input class="btn btn-default" type='button' v-on:click='precedent' value="<">
+              <span>{{ calendrier.calendrierMois }}</span>             
+              <input class="btn btn-default" type='button' v-on:click='suivant' value=">"><br>
+              <input class="col-md-10 btn btn-default" type='button' v-on:click='aujourdhui' id='ajd' value="Aujourd'hui">  
+            </div>  
+        </div>
             <thead>
                 <tr>
                     <th>L</th>
@@ -22,7 +25,7 @@
                 <template v-for="semaine in calendrier.calendrier">
                   <tr>
                 <template v-for="jour in semaine">                  
-                  <td v-if="jour[0] != '*'" :class="jour[1]" :id="jour[3]" v-on:click='rendezvousAffiche(jour[3])'>{{jour[0]}}
+                  <td tabindex="0" v-if="jour[0] != '*'" :class="jour[1]" :id="jour[3]" v-on:click='rendezvousAffiche(jour[3])'>{{jour[0]}}
                     <span v-if="jour[2] != 0">{{jour[2]}}</span>
                   </td>
                   <td v-else></td>
@@ -32,13 +35,29 @@
             </tbody>
         </table>
     </div>
-    <div>
-      <rendez-vous v-show="rendezvous"
-                   v-for="rdv in rdvs"
-                   v-bind:dateDebut="rdv.dateDebut"
-                   v-bind:dateFin="rdv.dateFin"
-                   v-bind:description="rdv.description"></rendez-vous>
-      <div v-show="rendezvous" v-if="rdvs==''">Pas de rendez-vous prévu à cette date</div>
+    <div v-show="composentDroite" id="rdv" class="col-md-6">
+      <button type="button" v-on:click="afficheRdvForm" class="btn btn-primary">Ajouter un RDV</button>
+      <div>        
+        <div class="alert alert-success" v-if="message != ''" v-text="message"></div> 
+        
+        <rendez-vous-form v-show="rendezvousform" 
+                          @completed="ajoutRDV" 
+                          v-bind:dateEnCours="dateEnCours"
+                          v-bind:periodes="periodes">
+        </rendez-vous-form>  
+        
+        <div v-show="rendezvous">
+          <rendez-vous v-if="rdvs != ''"
+                @completed="delRDV"
+                 v-for="rdv in rdvs"
+                 v-bind:id="rdv.id"                   
+                 v-bind:dateDebut="rdv.dateDebut"
+                 v-bind:dateFin="rdv.dateFin"
+                 v-bind:description="rdv.description">
+          </rendez-vous>
+          <div v-if="rdvs == ''">Aucun rendez-vous prévu à cette date.</div>        
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -47,17 +66,24 @@
 import axios from 'axios'
 import Vue from 'vue'
 import RendezVous from './RendezVous.vue'
+import RendezVousForm from './RendezVousForm.vue'
 
 export default {
     components: {
-        RendezVous
+        RendezVous,
+        RendezVousForm
     },
     data() {
         return {
-            rendezvous : false,
+            composentDroite : false,            
+            rendezvousform : false,
+            rendezvous: false,
             compteur: 0,
             calendrier: {},
-            rdvs: {}
+            rdvs: {},
+            message: '',
+            dateEnCours: '',
+            periodes: ''
         }
     },
     async created () {        
@@ -70,35 +96,71 @@ export default {
         }
     },
     methods: {        
-        suivant () {          
+        suivant () {    
+           this.composentDroite = false   
            this.calculCalendrier(++this.compteur)
         },
-        precedent () {          
+        precedent () {  
+           this.composentDroite = false       
            this.calculCalendrier(--this.compteur)
         },
-        aujourdhui () {          
-            this.compteur = 0;
+        aujourdhui () { 
+           this.composentDroite = false         
+           this.compteur = 0;
            this.calculCalendrier(this.compteur)
         },
-        async rendezvousAffiche (date) {
-            this.rendezvous = true   
+        async rendezvousAffiche (date) {            
             try {
                 const path = "http://localhost/symfonyVueJS_v2/public/index.php/rendezvous/".concat(date);       
                 const response = await axios.get(path)
-                this.rdvs = response.data
+                this.rdvs = response.data                
             } catch(e) {
                 // handle authentication error here
-            }     
+            }   
+            this.composentDroite = true  
+            this.rendezvous = true   
+            this.rendezvousform = false  
+            this.dateEnCours = date 
+            this.message = ''  
         },
-        async calculCalendrier (compteur) {
-           this.rendezvous = false  
+        async calculCalendrier (compteur) { 
             try {
                 const path = "http://localhost/symfonyVueJS_v2/public/index.php".concat(this.$route.fullPath).concat("/").concat(compteur);                
                 const response = await axios.get(path)
                 this.calendrier = response.data
             } catch(e) {
                 // handle authentication error here
-            }
+            }            
+           
+        },
+        delRDV(reponse) {
+            this.changementRdv(reponse)
+        },
+        ajoutRDV(reponse) {
+            this.changementRdv(reponse)
+        },
+        async afficheRdvForm() {
+            try {
+                axios.post('http://localhost/symfonyVueJS_v2/public/index.php/periode', JSON.stringify(this.dateEnCours))
+                    .then(response => {                   
+                        this.periodes = response.data
+                        this.rendezvousform = true
+                        this.rendezvous = false
+                        this.composentDroite = true
+                        this.message = ''
+                    })
+                    .catch(error => {
+                    })     
+            } catch(e) {
+            }           
+        },
+        changementRdv(reponse) {          
+            this.rdvs = reponse[0]
+            this.composentDroite = true            
+            this.rendezvous = true
+            this.rendezvousform = false
+            this.message = reponse[1]
+            this.calculCalendrier(this.compteur)
         }
     },   
 }
@@ -110,14 +172,21 @@ export default {
   #titre {
     background: red;
     height: 10em; 
-    line-height: 10em; 
-    white-space: nowrap;
     color:white; 
+    position: relative;
   }
 
 
   #calendrier {
-    text-align:center
+    text-align:center;
+    float:left;
+    margin-top: 10vh; 
+  }
+
+  #rdv {
+    float:right;
+     text-align:justify;
+    margin-top: 10vh;
   }
 
   table {
@@ -142,7 +211,12 @@ export default {
     cursor: pointer;
   }
 
-  span {
+  td:hover {
+    background:grey;
+    color:white
+  }
+
+  td span {
     position:absolute;
     z-index:2;
     background: red;
@@ -168,4 +242,25 @@ export default {
    .actif {
       background: green;
    }
+
+   #rdv button {
+      margin-bottom: 3em
+   }
+
+   #titre input {      
+      margin: 0 0.5em
+   }
+
+   #ajd {      
+      margin-top: 1em !important;
+   }
+
+   #titre div {      
+      position: absolute;
+      top: 20%; 
+      transform: translateY(-20%);
+      left: 50%; 
+      transform: translateX(-50%);
+   }
+
 </style>

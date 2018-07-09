@@ -5,7 +5,7 @@
 	            <ul>
 		            <li><router-link to="/"> Accueil </router-link></li>
 		            <li><router-link to="/calendrier"> RDV </router-link></li>
-		            <li><router-link to="/ajouter"> Ajouter un RDV </router-link></li>
+		            <li><router-link to="/modele"> Modèle de courriers </router-link></li>
 		        </ul>
 	    	</nav>
 	    </div>
