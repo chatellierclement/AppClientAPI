@@ -31,6 +31,23 @@ class RendezvousEntity
      */
     private $description;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\PeriodeEntity", inversedBy="rendezvous")
+     */
+    private $periode;
+
+    public function getPeriode(): ?PeriodeEntity
+    {
+        return $this->periode;
+    }
+
+    public function setPeriode(?PeriodeEntity $periode): self
+    {
+        $this->periode = $periode;
+
+        return $this;
+    }
+
     public function getId()
     {
         return $this->id;

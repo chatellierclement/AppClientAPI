@@ -1,46 +1,38 @@
 <template>
-	<div>
-		<div id="nav" class="col-md-2">
-			<nav>               
-	            <ul>
-		            <li><router-link to="/"> Accueil </router-link></li>
-		            <li><router-link to="/calendrier"> RDV </router-link></li>
-		            <li><router-link to="/modele"> Modèle de courriers </router-link></li>
-		        </ul>
-	    	</nav>
+	<div class="parent">
+		<div class="container-fluid">
+	  		<div class="row">
+		    	<div class="col-lg-2 collerAGauche">
+		    		<navbar></navbar>
+		    	</div>
+			    <div class="col-lg enfant">           
+			        <router-view></router-view>
+			    </div>
+		    </div>
 	    </div>
-
-	    <div id="section" class="col-md-10">
-	        <div class="container">            
-	            <router-view></router-view>
-	        </div>
-	    </div>
-    </div>
+	</div>
 </template>
 
-<style>
-	li {
-		list-style-type:none;
-	}
+<script>
+import Vue from 'vue'
+import Navbar from './Navbar.vue'
 
-	a {
-		text-decoration: none;
-		color:black
-	}
+export default {
+    components: {
+    	Navbar
+    }    
+}
 
-	a:hover {
-		text-decoration: none;
-		color:black
-	}
+</script>
 
-	#nav {
-		float:left;
-		height: 100vh;
-    	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-	}
-
-	#section {
-		float:right;
+<style>	
+	.parent {
+		display: flex;
+	}	
+	.enfant {
 		margin:auto;
 	}
+	.collerAGauche {
+		padding:0
+	}		
 </style>

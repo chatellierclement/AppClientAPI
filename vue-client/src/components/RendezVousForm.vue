@@ -1,20 +1,20 @@
 <template>
-    <div id="tt">
-        <form> 
-            <div>Choisir une des périodes disponibles</div>
-            <div id="periodes" v-if="periodes != ''" >
+    <div class="container-fluid" id="marge">
+        <div class="row">  
+            <div class="col-lg-12">Choisir une des périodes disponibles</div>
+            <div class="col-lg-12" id="periodes" v-if="periodes != ''" >
                 <template v-for="(periode, index) in periodes"> 
                         <input v-on:change="periodeChange(index)" :checked='false' type="radio" name="group"> {{periode.plageDispoDebut}} - {{periode.plageDispoFin}}<br>
                 </template>
             </div>
-            <div v-show="formulaire">
+            <div class="col-lg-12" v-show="formulaire">
                 <div id = "slider-6"></div>              
                 <input id="slidevalue" style = "text-align:center;border:0; color:#b9cd6d; font-weight:bold;">           
                 <input id = "changevalue" style = "text-align:center;border:0; color:#b9cd6d; font-weight:bold;">       
                 <input class="input col-md-12" title="description" placeholder="Description" v-model.lazy="description"><br>           
                 <button type="button" v-on:click="add(dateEnCours)" class="btn btn-primary">Enregistrer</button>
             </div>
-        </form>
+        </div>
     </div>
 </template>
 
@@ -39,7 +39,7 @@ export default {
             this.dateDebut = $( "#slidevalue" ).val()
             this.dateFin = $( "#changevalue" ).val()
             this.dateEnCoursForm = dateEnCours
-            axios.post('http://localhost/symfonyVueJS_v2/public/index.php/ajouter', JSON.stringify(this.$data))
+            axios.post("http://".concat(window.location.hostname).concat("/symfonyVueJS_v2/public/index.php/ajouter"), JSON.stringify(this.$data))
                 .then(response => {
 					this.retour = "Le rendez-vous a bien été enregistré"
                     this.$emit('completed', [response.data, this.retour]) 
@@ -85,15 +85,10 @@ function calculDate(time,value) {
 </script>
 
 <style>
-    #tt {
-        text-align:center;
-    }
-
     input {
         margin:0.75em 0;
         padding:0.2em 0 
     }
-
     #periodes {
         padding: 3em 0
     }

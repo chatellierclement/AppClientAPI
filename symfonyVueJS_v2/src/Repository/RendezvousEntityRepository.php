@@ -31,14 +31,16 @@ class RendezvousEntityRepository extends ServiceEntityRepository
              ->getSingleScalarResult();
     }
 
-    public function getRendezVousByDate($date)
+    public function getRendezVousByDate($date, $id)
     {
         $qb = $this->createQueryBuilder('a');
         return $qb
              ->select('a')
              ->andWhere(
                     $qb->expr()->like('a.dateDebut', ':dateDebut'))
+             ->andWhere('a.periode = :id')
              ->setParameter('dateDebut', $date.'%')
+             ->setParameter('id', $id)
              ->addOrderBy('a.dateDebut', 'ASC')
              ->getQuery()
              ->getResult();

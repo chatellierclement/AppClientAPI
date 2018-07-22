@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PeriodeEntityRepository")
@@ -26,7 +28,16 @@ class PeriodeEntity
      */
     private $finJournee;
 
-    
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\RendezVousEntity", mappedBy="periode")
+     */
+    private $rendezvous;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getDebutJournee(): ?string
     {
         return $this->debutJournee;
@@ -49,6 +60,20 @@ class PeriodeEntity
         $this->finJournee = $finJournee;
 
         return $this;
+    }
+
+
+    public function __construct()
+    {
+        $this->rendezvous = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|RendezVous[]
+     */
+    public function getRendezVous(): Collection
+    {
+        return $this->rendezvous;
     }
 
    

@@ -3,8 +3,7 @@ namespace App\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use App\Entity\RendezvousEntity;
-use App\Entity\PeriodeEntity;
+use App\Entity\PDFEntity;
 use Symfony\Component\HttpFoundation\Request;
 
 class PDFController extends ApiController
@@ -59,5 +58,46 @@ class PDFController extends ApiController
         $mpdf->Output();
         var_dump($mpdf);
 
+    }
+
+   /**
+    * @Route("/enregistrer")
+    * @Method("POST")
+    */
+    public function update(Request $request)
+    {
+        $data = $request->getContent();
+        $data = json_decode($data, true);
+
+        $em = $this
+              ->getDoctrine()
+              ->getManager()
+              ;
+
+        $modele = $em->getRepository('App:PDFEntity')->find($data["id"]);        
+
+        $modele->setTexte($data["content"]);        
+        $em->persist($modele);
+        $em->flush();
+
+        return $this->respond($modele);
+    }
+
+    /**
+    * @Route("/modele")
+    */
+    public function modele()
+    {        
+
+        $modele = $this
+              ->getDoctrine()
+              ->getManager()
+              ->getRepository('App:PDFEntity') 
+              ->find(1)        
+            ;       
+
+        $tabModele = ["id" => $modele->getId(), "texte" => $modele->getTexte() ];
+
+        return $this->respond($tabModele);
     }
 }

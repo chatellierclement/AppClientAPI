@@ -1,12 +1,12 @@
 <template>
-  <div id="t">
-  	<div id="a" class="col-md-1">
-  		<button v-on:click='del(id)' class="close" aria-label="Close">
-		  <span aria-hidden="true">&times;</span>
-		</button>
-  	</div>
-    <div id="g" class="col-md-3">{{dateDebut}} - {{dateFin}}</div>
-    <div id="d" class="col-md-8">{{description}}</div>
+  <div class="container-fluid" id="marge">
+    <div class="row">     
+      <button v-on:click='del(id)' class="close col-lg-1" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>      
+      <div class="col-lg-4">{{dateDebut}} - {{dateFin}}</div>
+      <div class="col-lg-7">{{description}}</div>    
+    </div>
   </div>
 </template>
 
@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         async del(id) {
-            axios.post('http://localhost/symfonyVueJS_v2/public/index.php/delete', JSON.stringify(id))
+            axios.post("http://".concat(window.location.hostname).concat("/symfonyVueJS_v2/public/index.php/delete"), JSON.stringify(id))
                 .then(response => {
                 	this.retour = "Le rendez-vous a bien été supprimé."
                 	this.$emit('completed', [response.data, this.retour])
@@ -38,19 +38,11 @@ export default {
 </script>
 
 <style>
-	#t {
-		padding: 2em 0
-	}
-
-  #g, #a {
-  	float:left;
+  div div button span {
+  	color:red;
+    width:0.5px;
   }
-
-  #d {
-  	float:right
-  }
-
-  #a button {
-  	color:red
+  #marge {
+    padding: 1em 0
   }
 </style>
